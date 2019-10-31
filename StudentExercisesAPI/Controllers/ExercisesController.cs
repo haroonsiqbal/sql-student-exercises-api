@@ -105,11 +105,14 @@ namespace StudentExercisesAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Exercise (ExerciseName, ExerciseLang)
+                    cmd.CommandText = @"INSERT INTO Exercise (ExerciseName, ExerciseLang, StudentId, InstructorId)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@exerciseName, @exerciseLang)";
+                                        VALUES (@exerciseName, @exerciseLang, @studentId, @instructorId)";
                     cmd.Parameters.Add(new SqlParameter("@exerciseName", exercise.ExerciseName));
                     cmd.Parameters.Add(new SqlParameter("@exerciseLang", exercise.ExerciseLang));
+                    cmd.Parameters.Add(new SqlParameter("@studentId", exercise.StudentId));
+                    cmd.Parameters.Add(new SqlParameter("@instructorId", exercise.InstructorId));
+
 
                     int newId = (int)cmd.ExecuteScalar();
                     exercise.Id = newId;

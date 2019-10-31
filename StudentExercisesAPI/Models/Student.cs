@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace StudentExercisesAPI.Models
 {
@@ -9,6 +10,7 @@ namespace StudentExercisesAPI.Models
         public int Id { get; set; }
         public string StuFirstName { get; set; }
         public string StuLastName { get; set; }
+        [StringLength(12, MinimumLength = 3)]
         public string StuSlackHandle { get; set; }
         public int CohortId { get; set; }
         public Cohort Cohort { get; set; }
