@@ -9,6 +9,7 @@ namespace StudentExercisesAPI.Models
     {
         public int Id { get; set; }
         [Required]
+
         public string ExerciseName { get; set; }
         [Required]
         public string ExerciseLang { get; set; }

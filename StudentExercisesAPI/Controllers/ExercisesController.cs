@@ -38,7 +38,7 @@ namespace StudentExercisesAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, ExerciseName, ExerciseLang, StudentId, InstructorId FROM Exercise";
+                    cmd.CommandText = "SELECT Id, ExerciseName, ExerciseLang FROM Exercise";
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Exercise> exercises = new List<Exercise>();
 
@@ -48,9 +48,7 @@ namespace StudentExercisesAPI.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             ExerciseName = reader.GetString(reader.GetOrdinal("ExerciseName")),
-                            ExerciseLang = reader.GetString(reader.GetOrdinal("ExerciseLang")),
-                            StudentId = reader.GetInt32(reader.GetOrdinal("StudentId")),
-                            InstructorId = reader.GetInt32(reader.GetOrdinal("InstructorId"))
+                            ExerciseLang = reader.GetString(reader.GetOrdinal("ExerciseLang"))
 
                         };
 
@@ -105,13 +103,11 @@ namespace StudentExercisesAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Exercise (ExerciseName, ExerciseLang, StudentId, InstructorId)
+                    cmd.CommandText = @"INSERT INTO Exercise (ExerciseName, ExerciseLang)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@exerciseName, @exerciseLang, @studentId, @instructorId)";
+                                        VALUES (@exerciseName, @exerciseLang)";
                     cmd.Parameters.Add(new SqlParameter("@exerciseName", exercise.ExerciseName));
                     cmd.Parameters.Add(new SqlParameter("@exerciseLang", exercise.ExerciseLang));
-                    cmd.Parameters.Add(new SqlParameter("@studentId", exercise.StudentId));
-                    cmd.Parameters.Add(new SqlParameter("@instructorId", exercise.InstructorId));
 
 
                     int newId = (int)cmd.ExecuteScalar();
