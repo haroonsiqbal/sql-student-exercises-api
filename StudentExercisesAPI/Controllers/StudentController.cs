@@ -38,9 +38,11 @@ namespace StudentExercisesAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT s.Id, s.StuFirstName, s.StuLastName, s.StuSlackHandle, s.CohortId, c.CohortName
-                                        FROM Student s 
-                                        INNER JOIN Cohort c ON s.CohortID = c.Id";
+                    cmd.CommandText = @"SELECT s.Id, s.StuFirstName, s.StuLastName, s.StuSlackHandle, s.CohortId, c.CohortName,
+                                        se.ExerciseId, e.ExerciseName, e. ExerciseLang
+                                        FROM Student s INNER JOIN Cohort c ON s.CohortID = c.Id
+                                        LEFT JOIN StudentExercises se on se.StudentId = s.Id
+                                        LEFT JOIN Exercise e on se.ExerciseId = e.Id";
                     SqlDataReader reader = cmd.ExecuteReader();
                     Dictionary<int, Student> students = new Dictionary<int, Student>();
 
@@ -65,18 +67,18 @@ namespace StudentExercisesAPI.Controllers
 
                             students.Add(studentId, student);
                         }
-                        //Student fromDictionary = students[studentId];
-                        
-                        //if (!reader.IsDBNull(reader.GetOrdinal("ExerciseId")))
-                        //{
-                        //    Exercise anExercise = new Exercise()
-                        //    {
-                        //        Id = reader.GetInt32(reader.GetOrdinal("ExerciseId")),
-                        //        ExerciseName = reader.GetString(reader.GetOrdinal("ExerciseName")),
-                        //        ExerciseLang = reader.GetString(reader.GetOrdinal("ExerciseLang"))
-                        //    };
-                        //    fromDictionary.exercises.Add(anExercise);
-                        //}
+                        Student fromDictionary = students[studentId];
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("ExerciseId")))
+                        {
+                            Exercise anExercise = new Exercise()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ExerciseId")),
+                                ExerciseName = reader.GetString(reader.GetOrdinal("ExerciseName")),
+                                ExerciseLang = reader.GetString(reader.GetOrdinal("ExerciseLang"))
+                            };
+                            fromDictionary.exercises.Add(anExercise);
+                        }
                     }
                         reader.Close();
 
