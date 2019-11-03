@@ -31,7 +31,7 @@ namespace StudentExercisesAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string InstFirstName, string sort)
         {
             using (SqlConnection conn = Connection)
             {
@@ -40,7 +40,13 @@ namespace StudentExercisesAPI.Controllers
                 {
                     cmd.CommandText = @"SELECT i.Id, i.InstFirstName, i.InstLastName, i.InstSlackHandle, i.InstCohort, c.CohortName
                                         FROM Instructor i 
-                                        INNER JOIN Cohort c ON i.InstCohort = c.Id";
+                                        INNER JOIN Cohort c ON i.InstCohort = c.Id
+                                        WHERE InstFirstName LIKE @InstFirstName";
+                    if (sort == "InstFirstName")
+                    { cmd.CommandText += " ORDER BY InstFirstName"; }
+                    else if (sort == "InstLastName")
+                    { cmd.CommandText += " ORDER BY InstLastName";}
+                    cmd.Parameters.Add(new SqlParameter("@instFirstName", $"%{InstFirstName}%"));
                     SqlDataReader reader = cmd.ExecuteReader();
                     Dictionary<int, Instructor> instructors = new Dictionary<int, Instructor>();
 

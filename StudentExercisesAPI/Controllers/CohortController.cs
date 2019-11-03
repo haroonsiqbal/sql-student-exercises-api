@@ -31,7 +31,7 @@ namespace StudentExercisesAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string CohortName, string q)
         {
             using (SqlConnection conn = Connection)
             {
@@ -41,7 +41,13 @@ namespace StudentExercisesAPI.Controllers
                     cmd.CommandText = @"SELECT c.Id, c.CohortName, s.StuFirstName, s.StuLastName, s.StuSlackHandle, i.InstFirstName, i.InstLastName, i.InstSlackHandle, s.Id AS StudentId, i.Id AS InstructorId
                                         FROM Cohort c 
                                         INNER JOIN Student s ON s.CohortId = c.Id
-                                        LEFT JOIN Instructor i ON i.InstCohort = c.Id";
+                                        LEFT JOIN Instructor i ON i.InstCohort = c.Id
+                                        ";
+                    if (q == "CohortName")
+                    {
+                        cmd.CommandText += " WHERE CohortName LIKE @cohortName";
+                    }
+                    cmd.Parameters.Add(new SqlParameter("@cohortName", $"%{CohortName}"));
                     SqlDataReader reader = cmd.ExecuteReader();
                     Dictionary<int, Cohort> cohorts = new Dictionary<int, Cohort>();
 
