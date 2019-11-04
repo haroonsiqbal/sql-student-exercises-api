@@ -99,53 +99,59 @@ namespace StudentExercisesAPI.Controllers
                 {
                     cmd.CommandText = @"
                         SELECT
-                            Id, ExerciseName, ExerciseLang
-                        FROM Exercise
+                            Id, StuFirstName, StuLastName, StuSlackHandle, CohortId
+                        FROM Student
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    Exercise exercise = null;
+                    Student student = null;
 
                     if (reader.Read())
                     {
-                        exercise = new Exercise
+                        student = new Student
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            ExerciseName = reader.GetString(reader.GetOrdinal("ExerciseName")),
-                            ExerciseLang = reader.GetString(reader.GetOrdinal("ExerciseLang"))
+                            StuFirstName = reader.GetString(reader.GetOrdinal("StuFirstName")),
+                            StuLastName = reader.GetString(reader.GetOrdinal("StuLastName")),
+                            StuSlackHandle = reader.GetString(reader.GetOrdinal("StuSlackHandle")),
+                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
                         };
                     }
                     reader.Close();
 
-                    return Ok(exercise);
+                    return Ok(student);
                 }
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Exercise exercise)
+        public async Task<IActionResult> Post([FromBody] Student student)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Exercise (ExerciseName, ExerciseLang)
+                    cmd.CommandText = @"INSERT INTO Student (StuFirstName, StuLastName, StuSlackHandle, CohortId, InstructorId)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@exerciseName, @exerciseLang)";
-                    cmd.Parameters.Add(new SqlParameter("@exerciseName", exercise.ExerciseName));
-                    cmd.Parameters.Add(new SqlParameter("@exerciseLang", exercise.ExerciseLang));
+                                        VALUES (@stuFirstName, @stuLastName, @stuSlackHandle, @cohortId, @instructorId)";
+                    cmd.Parameters.Add(new SqlParameter("@stuFirstName", student.StuFirstName));
+                    cmd.Parameters.Add(new SqlParameter("@stuLastName", student.StuLastName));
+                    cmd.Parameters.Add(new SqlParameter("@stuSlackHandle", student.StuSlackHandle));
+                    cmd.Parameters.Add(new SqlParameter("@cohortId", student.CohortId));
+                    cmd.Parameters.Add(new SqlParameter("@instructorId", student.InstructorId));
+
 
                     int newId = (int)cmd.ExecuteScalar();
-                    exercise.Id = newId;
-                    return CreatedAtRoute("GetExercise", new { id = newId }, exercise);
+                    student.Id = newId;
+                    return CreatedAtRoute("GetStudent", new { id = newId }, student);
                 }
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Exercise exercise)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Student student)
         {
             try
             {
@@ -154,12 +160,16 @@ namespace StudentExercisesAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Exercise
-                                            SET ExerciseName = @exerciseName,
-                                                ExerciseLang = @exerciseLang
+                        cmd.CommandText = @"UPDATE Student
+                                            SET StuFirstName = @stuFirstName,
+                                                StuLastName = @stuLastName,
+                                                StuSlackHandle = @stuSlackHandle,
+                                                CohortId = @cohortId
                                             WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@exerciseName", exercise.ExerciseName));
-                        cmd.Parameters.Add(new SqlParameter("@exerciseLang", exercise.ExerciseLang));
+                        cmd.Parameters.Add(new SqlParameter("@stuFirstName", student.StuFirstName));
+                        cmd.Parameters.Add(new SqlParameter("@stuLastName", student.StuLastName));
+                        cmd.Parameters.Add(new SqlParameter("@stuSlackHandle", student.StuSlackHandle));
+                        cmd.Parameters.Add(new SqlParameter("@cohortId", student.CohortId));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
@@ -173,7 +183,7 @@ namespace StudentExercisesAPI.Controllers
             }
             catch (Exception)
             {
-                if (!ExerciseExists(id))
+                if (!StudentExists(id))
                 {
                     return NotFound();
                 }
@@ -194,7 +204,7 @@ namespace StudentExercisesAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM Exercise WHERE Id = @id";
+                        cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
@@ -208,7 +218,7 @@ namespace StudentExercisesAPI.Controllers
             }
             catch (Exception)
             {
-                if (!ExerciseExists(id))
+                if (!StudentExists(id))
                 {
                     return NotFound();
                 }
@@ -219,7 +229,7 @@ namespace StudentExercisesAPI.Controllers
             }
         }
 
-        private bool ExerciseExists(int id)
+        private bool StudentExists(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -227,8 +237,8 @@ namespace StudentExercisesAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, ExerciseName, ExerciseLang
-                        FROM Exercise
+                        SELECT Id, StuFirstName, StuLastName, StuSlackHandle, CohortId
+                        FROM Student
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
