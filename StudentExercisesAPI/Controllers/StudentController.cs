@@ -164,23 +164,26 @@ namespace StudentExercisesAPI.Controllers
                                             SET StuFirstName = @stuFirstName,
                                                 StuLastName = @stuLastName,
                                                 StuSlackHandle = @stuSlackHandle,
-                                                CohortId = @cohortId
+                                                CohortId = @cohortId,
+                                                InstructorId = @instructorId
                                             WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@stuFirstName", student.StuFirstName));
                         cmd.Parameters.Add(new SqlParameter("@stuLastName", student.StuLastName));
                         cmd.Parameters.Add(new SqlParameter("@stuSlackHandle", student.StuSlackHandle));
                         cmd.Parameters.Add(new SqlParameter("@cohortId", student.CohortId));
+                        cmd.Parameters.Add(new SqlParameter("@instructorId", student.InstructorId));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
+                        int rowsaffected = cmd.ExecuteNonQuery();
+                        if (rowsaffected > 0)
                         {
                             return new StatusCodeResult(StatusCodes.Status204NoContent);
                         }
-                        throw new Exception("No rows affected");
+                        throw new Exception("no rows affected");
                     }
                 }
             }
+
             catch (Exception)
             {
                 if (!StudentExists(id))
@@ -237,7 +240,7 @@ namespace StudentExercisesAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, StuFirstName, StuLastName, StuSlackHandle, CohortId
+                        SELECT Id, StuFirstName, StuLastName, StuSlackHandle, CohortId, InstructorId
                         FROM Student
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
